@@ -1,6 +1,0 @@
-.github/workflows/android.yml
-app/build.gradle
-app/src/main/...
-build.gradle
-settings.gradle
-gradle.properties
