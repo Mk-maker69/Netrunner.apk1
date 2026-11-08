@@ -7,6 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Mostrar arquivos do repositorio
+        run: |
+          ls -la
+          ls -la app || echo "SEM PASTA app"
+      - name: Corrigir arquivos do Gradle da raiz
+        run: |
+          printf '%s\n' "plugins { id 'com.android.application' version '8.5.2' apply false }" > build.gradle
+          printf '%s\n' "pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }" "dependencyResolutionManagement { repositories { google(); mavenCentral() } }" "rootProject.name = 'Netrunner'" "include ':app'" > settings.gradle
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
