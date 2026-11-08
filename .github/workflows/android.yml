@@ -7,14 +7,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Mostrar arquivos do repositorio
+      - name: Montar estrutura do projeto Android
         run: |
-          ls -la
-          ls -la app || echo "SEM PASTA app"
-      - name: Corrigir arquivos do Gradle da raiz
-        run: |
+          mkdir -p app/src/main/assets app/src/main/java/com/netrunner/game
+          mkdir -p app/src/main/res/values app/src/main/res/mipmap-anydpi-v26 app/src/main/res/drawable-xxxhdpi
+          for d in mdpi hdpi xhdpi xxhdpi xxxhdpi; do mkdir -p app/src/main/res/mipmap-$d; done
+          cp index.html app/src/main/assets/index.html
+          cp AndroidManifest.xml app/src/main/AndroidManifest.xml
+          cp MainActivity.java app/src/main/java/com/netrunner/game/MainActivity.java
+          cp styles.xml colors.xml app/src/main/res/values/
+          cp ic_launcher.xml ic_launcher_round.xml app/src/main/res/mipmap-anydpi-v26/
+          cp ic_launcher_background.png ic_launcher_foreground.png app/src/main/res/drawable-xxxhdpi/
+          for d in mdpi hdpi xhdpi xxhdpi xxxhdpi; do cp ic_launcher.png ic_launcher_round.png app/src/main/res/mipmap-$d/; done
           printf '%s\n' "plugins { id 'com.android.application' version '8.5.2' apply false }" > build.gradle
           printf '%s\n' "pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }" "dependencyResolutionManagement { repositories { google(); mavenCentral() } }" "rootProject.name = 'Netrunner'" "include ':app'" > settings.gradle
+          cat > app/build.gradle <<'EOF'
+          plugins { id 'com.android.application' }
+          android {
+              namespace 'com.netrunner.game'
+              compileSdk 34
+              defaultConfig {
+                  applicationId 'com.netrunner.game'
+                  minSdk 21
+                  targetSdk 34
+                  versionCode 10
+                  versionName '0.10'
+              }
+              compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+              androidResources { noCompress 'html' }
+          }
+          EOF
+          find app -type f | sort
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
